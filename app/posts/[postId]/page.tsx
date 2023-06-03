@@ -8,6 +8,14 @@ type Params = {
   }
 }
 
+export function generateStaticParams() {
+  const posts = getSortedPostsData(); // deduped... "Request data where you need it"
+
+  return posts.map((post) => ({
+    postId:post.id
+  }))
+}
+
 export function generateMetadata({params}: Params) {
 
   const posts = getSortedPostsData(); // deduped... "Request data where you need it"
