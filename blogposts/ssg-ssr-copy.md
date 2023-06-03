@@ -1,9 +1,9 @@
 ---
-title: 'Two Forms of Pre-rendering'
-date: '2023-03-14'
+title: 'SSR copy'
+date: '2023-07-21'
 ---
 
-We recommendsd using **Static Generation** (with and without data) whenever possible because your page can be built once and served by CDN, which makes it much faster than having a server render the page on every request.
+We 456 using **Static Generation** (with and without data) whenever possible because your page can be built once and served by CDN, which makes it much faster than having a server render the page on every request.
 
 You can use Static Generation for many types of pages, including:
 

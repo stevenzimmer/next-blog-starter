@@ -3,7 +3,7 @@ import ListItem from "./ListItem";
 export default function Posts() {
 
   const posts = getSortedPostsData();
-  // console.log({posts});
+  
   return (
     <section className="py-6 mx-auto max-w-2xl">
       <h2 className="text-4xl font-bold dark:text-white/90">
