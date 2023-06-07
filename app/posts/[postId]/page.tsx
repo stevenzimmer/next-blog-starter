@@ -1,27 +1,35 @@
 import Link from "next/link";
-import { getSortedPostsData, getPostData } from "@/lib/post";
+import { getPostsMeta, getPostByName } from "@/lib/post";
 import getFormattedDate from "@/lib/getFormattedDate";
 import {notFound} from "next/navigation";
-type Params = {
+import "highlight.js/styles/github-dark.css";
+import kebabCase from "kebab-case";
+
+export const revalidate = 86400;
+
+type Props = {
   params: {
     postId: string
   }
 }
 
-export function generateStaticParams() {
-  const posts = getSortedPostsData(); // deduped... "Request data where you need it"
+export async function generateStaticParams() {
+  const posts = await getPostsMeta(); // deduped... "Request data where you need it"
+
+  if(!posts ) return [];
 
   return posts.map((post) => ({
     postId:post.id
   }))
 }
 
-export function generateMetadata({params}: Params) {
+export async function generateMetadata({params: {postId}}: Props) {
 
-  const posts = getSortedPostsData(); // deduped... "Request data where you need it"
-  const {postId } = params;
+  const post = await getPostByName(`${postId}.mdx`); // deduped... "Request data where you need it"
 
-  const post = posts.find(post => post.id === postId);
+  // if(!posts) return [];
+
+  // const post = posts.find(post => post.id === postId);
 
   if(!post) {
     return {
@@ -29,37 +37,45 @@ export function generateMetadata({params}: Params) {
     }
   }
   return {
-    title: `${post.title} | Zim Blog`
+    title: `${post.meta.title} | Zim Blog`
   }
 
 }
 
-export default async function BlogPostPage({params}: Params) {
+export default async function BlogPostPage({params: { postId }}: Props) {
 
-  const posts = getSortedPostsData(); // deduped... "Request data where you need it"
-  const {postId } = params;
+  const post = await getPostByName(`${postId}.mdx`); // deduped... "Request data where you need it"
 
-  if(!posts.find(post => post.id === postId)) {
-    return notFound()
-  }
+  if(!post) notFound();
 
-  const  { title, date, contentHtml} = await getPostData(postId);
+  const { meta, content } = post;
 
-  const pubDate = getFormattedDate(date);
+  const pubDate = getFormattedDate(meta.date);
+
+  const tags = meta.tags.map((tag, i) => (
+    <Link key={i} href={`/tags/${tag.replaceAll(" ", "-")}`}>{tag}</Link>
+  ));
+
   return (
-    <main>
-      <h1>{title}</h1>
+<>
+      <h1>{meta.title}</h1>
       <p>
         {pubDate}
       </p>
       <article>
-        <section dangerouslySetInnerHTML={{__html
-        : contentHtml}} />
-
-        <p>
+        {content}
+      </article>
+      <section>
+        <h3>Related:</h3>
+        <div className="flex flex-row gap-4">
+        {tags}
+        </div>
+      </section>
+        <p className="mb-10">
           <Link href="/">Back to home</Link>
         </p>
-      </article>
-      </main>
+        
+   
+</>
   )
 }
